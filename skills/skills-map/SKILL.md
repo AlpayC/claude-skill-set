@@ -60,6 +60,7 @@ Nothing in the chain asks the human a question. Decisions go to the ledger in `a
 |---|---|
 | `self-review` | Before a human sees the diff |
 | `pr-package` | Assembling the handover the reviewer actually reads |
+| `review-run` | Going through a finished run with the human — decisions first, screenshots inline, verdicts applied on the spot |
 | `adr-capture` | A decision was made that constrains future work |
 | `session-handoff` | Context is running out, or work is being stopped or handed to someone else |
 

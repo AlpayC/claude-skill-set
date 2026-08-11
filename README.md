@@ -48,7 +48,7 @@ domain-glossary ─┘      ↑ ui-spec           ↑ tdd-frontend
 **Fundament** — `repo-cartograph` · `context-baseline` · `api-contract-sync` · `domain-glossary`
 **Vor der Umsetzung** — `epic-map` · `spec-forge` · `grill-spec` · `ui-spec`
 **Während** — `implement-spec` · `agentic-guardrails` · `guardrail-hooks` · `green-gate` · `visual-verify` · `pattern-mine` · `tdd-frontend` · `bug-hunt` · `refactor-safe` · `dep-upgrade`
-**Danach** — `self-review` · `pr-package` · `adr-capture` · `session-handoff`
+**Danach** — `self-review` · `pr-package` · `review-run` · `adr-capture` · `session-handoff`
 **Wissen** — `explain-like-im-new` · `feature-trace` · `arc42-sync` · `dev-wiki` · `runbook`
 **CI/CD** — `pipeline-doctor` · `flaky-triage` · `ci-authoring` · `perf-budget`
 **Meta** — `autonomy-postmortem` · `skill-forge` · `skills-map`
@@ -104,6 +104,15 @@ Schritt 5 ist der wichtigste. Ohne ihn bleibt der Satz so autonom wie am Install
 | `.agent/evidence/<id>/` | `green-gate`, `visual-verify`, `bug-hunt` | Gate-Output, Screenshots, Console/Network, Repro-Kommando, gerankte Hypothesen |
 
 `.agent/` gehört in die `.gitignore`; `docs/` wird committet.
+
+## Die Morgen-Review
+
+Zwei getrennte Oberflächen, mit Absicht:
+
+- **Überblick** — `node tools/evidence-board.mjs <repo>` erzeugt `.agent/board.html`: alle Läufe in vier Spalten (Spec bereit, Läuft, Review nötig, Blockiert), Lücken gelb markiert, Screenshots eingebettet. Eine Datei ohne Server, gitignored, weil sie interne Screenshots enthält.
+- **Eingriff** — `review-run` legt dir einen Lauf **im Gespräch** vor: Entscheidungen zuerst mit Empfehlung, Screenshots inline gerendert, Lücken als Fragen formuliert. Du antwortest an derselben Stelle, der Agent setzt sofort um.
+
+Das Board sagt dir, worauf du schauen musst. Der Eingriff passiert im Chat, damit ein Einwand einen Satz kostet statt Kopieren und Fensterwechsel.
 
 ## Parallelität
 
