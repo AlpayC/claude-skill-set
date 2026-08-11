@@ -1,6 +1,6 @@
 ---
 name: arc42-sync
-description: Maintains architecture documentation as an arc42 document under docs/architecture/ — generates the chapters derivable from code, marks the ones that are not, drift-checks the generated ones. Run it to set up arc42, to refresh after a restructure, or as a CI check.
+description: Documents how a system is put together, as an arc42 document under docs/architecture/ — generates the chapters derivable from code, marks the ones that are not, drift-checks the generated ones. Run it when asked what talks to what, where a component sits, or how the system is deployed; when the architecture documentation is missing, stale or being set up; or as a CI check.
 ---
 
 # arc42 sync

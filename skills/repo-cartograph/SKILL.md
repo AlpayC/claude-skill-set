@@ -1,6 +1,6 @@
 ---
 name: repo-cartograph
-description: Builds and refreshes docs/agent/repo-map.md — workspace kind, every project with its stack, the boundary rules, the gate commands, and how to compute the changed set. Run it when onboarding a repo, when the map is stale, or after projects change. Every other skill reads it instead of re-detecting.
+description: Surveys an unfamiliar repo and writes what it found to docs/agent/repo-map.md — workspace kind, every project with its stack, boundary rules, gate commands, changed-set command. Run it when asked what a repo contains, which projects or which stack it has, how it is tested or built; when landing in a repo not yet mapped; when the map is stale; or before any skill that reads it.
 ---
 
 # Repo cartograph

@@ -1,6 +1,6 @@
 ---
 name: domain-glossary
-description: Maintains docs/agent/glossary.md, the map from business vocabulary to code identifiers — which class, route, endpoint and table a domain term lives in. Build it when onboarding a domain; consult it when a ticket's term has no obvious code home, or a concept appears under several names.
+description: Resolves business vocabulary to code — which class, route, endpoint and table a domain term actually lives in, and the legacy names it still goes by. Run it when a ticket's wording has no obvious home in the code, when the same concept appears under several names, or when onboarding to an unfamiliar domain. Kept in docs/agent/glossary.md.
 ---
 
 # Domain glossary
