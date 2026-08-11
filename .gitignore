@@ -1,0 +1,11 @@
+# Agent run state and evidence — local, never committed
+.agent/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.swp
+
+# Node
+node_modules/
+*.log
