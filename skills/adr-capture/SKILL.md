@@ -1,6 +1,6 @@
 ---
 name: adr-capture
-description: Records an architectural decision as a numbered ADR in docs/adr/ — context, options weighed, choice, consequences. Run it when a decision constrains future work, when a pattern is deliberately broken, or when nobody can say why the code is like this.
+description: Answers why the code is the way it is, durably — a numbered ADR under docs/adr/ carrying the context, the options weighed, the choice and its consequences. Run it when a decision constrains work beyond this change, when a pattern is deliberately broken, or when nobody on the team can say why something was done this way.
 ---
 
 # ADR capture

@@ -1,6 +1,6 @@
 ---
 name: context-baseline
-description: Creates and maintains the CLAUDE.md hierarchy — root plus one per project that deviates — carrying the conventions, reasons and gotchas an agent cannot find by reading config. Run it when a repo has no agent context, or when a run failed on an undocumented convention.
+description: Teaches an agent the conventions, reasons and gotchas a repo never wrote down — captured as a CLAUDE.md hierarchy, root plus one per project that deviates. Run it when a repo has no agent context, when a run failed on an undocumented convention, or when a postmortem produces a fix that belongs in context.
 ---
 
 # Context baseline

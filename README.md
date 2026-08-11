@@ -65,13 +65,15 @@ Details und Auswahlhilfe: `/skills-map`.
 
 Skills werden beim nächsten Start von Claude Code geladen.
 
-Die Hooks werden **pro Ziel-Repo** installiert, weil sie dessen Blast Radius und Evidence prüfen:
+Skills und die drei Reviewer-Agenten kommen mit `install.ps1`. Hooks und Permissions werden **pro Ziel-Repo** installiert, weil sie dessen Blast Radius und Evidence prüfen:
 
 ```bash
-node hooks/install-hooks.mjs C:\pfad\zum\repo             # team-weit, .claude/settings.json
-node hooks/install-hooks.mjs C:\pfad\zum\repo --local     # persönlich, settings.local.json
-node hooks/install-hooks.mjs C:\pfad\zum\repo --dry-run   # nur zeigen
+node hooks/install-hooks.mjs C:\pfad\zum\repo --permissions   # Hooks + Allowlist
+node hooks/install-hooks.mjs C:\pfad\zum\repo --local         # persönlich, settings.local.json
+node hooks/install-hooks.mjs C:\pfad\zum\repo --dry-run       # nur zeigen
 ```
+
+`--permissions` merged die Allowlist aus `settings/permissions.json` dazu — sie lässt einen unbeaufsichtigten Lauf durchlaufen, ohne Permissions komplett zu umgehen. Begründung und was bewusst **nicht** drin ist: `settings/README.md`.
 
 Merged in bestehende Settings, idempotent, ergänzt `.agent/` in der `.gitignore`. Danach einmal `/hooks` öffnen oder neu starten — der Settings-Watcher folgt nur Verzeichnissen, die beim Sessionstart schon eine Settings-Datei hatten.
 
@@ -131,6 +133,18 @@ Die 32 model-invoked Beschreibungen liegen bei ~8,4 KB (≈ 2.100 Token) und sin
 Bis auf `skills-map` und `skill-forge` sind alle Skills model-invoked — sie feuern selbst und können sich gegenseitig aufrufen, was die Kette überhaupt erst ohne Tippen laufen lässt. Preis dafür ist, dass ihre `description` in jedem Turn im Kontext liegt.
 
 Wer das reduzieren will: `disable-model-invocation: true` ins Frontmatter der Skills, die nur per Hand starten sollen. Was in einer Kette steckt, bleibt model-invoked — ein user-invoked Skill kann von keinem anderen Skill erreicht werden.
+
+## Was noch im Repo liegt
+
+| Pfad | Wofür |
+|---|---|
+| `hooks/` | Vier Node-Hooks, die vier Guardrail-Regeln erzwingen statt erbitten |
+| `agents/` | Die drei Reviewer, die `self-review` in frischem Kontext losschickt — ohne Editier-Werkzeuge |
+| `settings/` | Permissions-Allowlist plus die Begründung, was drin ist und was nicht |
+| `tools/evidence-board.mjs` | Das Review-Board über alle Läufe |
+| `tools/check.mjs` | Prüft den Skill-Satz selbst — vor dem Commit und in CI |
+
+`node tools/check.mjs` meldet Fehler (Skill lädt nicht) und Warnungen (Skill lädt, feuert aber vermutlich nicht). Die Warnung „leads with the artefact" fängt genau den Fehler, der `repo-cartograph` im echten Repo nicht feuern ließ.
 
 ## Anpassen
 

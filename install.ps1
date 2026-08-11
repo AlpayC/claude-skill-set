@@ -59,6 +59,10 @@ $skills = Get-ChildItem -Path $sourceRoot -Directory |
 
 if (-not $skills) { throw "No skills with a SKILL.md found in $sourceRoot" }
 
+# Agent definitions live beside the skills and install into a sibling directory.
+$agentSource = Join-Path $PSScriptRoot 'agents'
+$agentDest = Join-Path (Split-Path $destRoot -Parent) 'agents'
+
 $installed = 0
 $skipped = 0
 
@@ -86,6 +90,25 @@ foreach ($skill in $skills) {
     $installed++
 }
 
+# --- agent definitions ------------------------------------------------------
+$agentsInstalled = 0
+if (Test-Path $agentSource) {
+    if (-not (Test-Path $agentDest)) {
+        New-Item -ItemType Directory -Path $agentDest -Force | Out-Null
+    }
+    foreach ($agent in Get-ChildItem -Path $agentSource -Filter '*.md') {
+        $dest = Join-Path $agentDest $agent.Name
+        if ((Test-Path $dest) -and -not $Force) {
+            Write-Host "  skip    $($agent.Name) (exists; use -Force to replace)" -ForegroundColor DarkYellow
+            continue
+        }
+        Copy-Item -Path $agent.FullName -Destination $dest -Force
+        Write-Host "  agent   $($agent.Name)" -ForegroundColor Cyan
+        $agentsInstalled++
+    }
+}
+
 Write-Host ''
-Write-Host "$installed installed, $skipped skipped -> $destRoot"
+Write-Host "$installed skills installed, $skipped skipped -> $destRoot"
+if ($agentsInstalled -gt 0) { Write-Host "$agentsInstalled agents installed -> $agentDest" }
 Write-Host 'Restart Claude Code to load them. Then run /skills-map for the index.'

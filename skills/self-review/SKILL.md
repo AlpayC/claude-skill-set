@@ -27,6 +27,8 @@ Confirm the blast radius while you are here: run the changed-set command from `d
 
 Three subagents in parallel, each in **fresh context** — they see the diff and their own brief, never the reasoning that produced the change, so they judge the result on its own terms. Keep the axes separate: merged into one review, the loudest axis masks the others, and convention findings are always louder than behavioural ones.
 
+Where the `spec-reviewer`, `convention-reviewer` and `runtime-reviewer` agent definitions are installed, dispatch those — they carry the briefs below and have no edit tools, so a reviewer cannot quietly become an author. Otherwise dispatch general agents with the briefs written out.
+
 Give each the diff command (`git diff <base>...HEAD`) and the commit list.
 
 **Spec.** Also give it the spec file. Brief: name requirements that are missing or partial; behaviour in the diff that no criterion asked for; and requirements that look implemented but where the implementation does not match what the criterion says. Quote the criterion for each finding. The third category is the one that matters — a criterion saying two seconds against code with a five-second timeout passes a glance and fails the spec.

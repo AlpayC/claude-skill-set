@@ -1,6 +1,6 @@
 ---
 name: grill-spec
-description: Adversarial interrogation of a spec, plan or architecture idea before code exists — works a fixed set of frontend dimensions to find the unstated state, the missing permission case, the timezone bug, the thing that breaks at 10,000 rows. Findings go back into the spec.
+description: Finds the holes in a spec before code exists — works a fixed set of frontend dimensions for the unstated state, the missing permission case, the timezone bug, the thing that breaks at 10,000 rows. Run it on a spec draft before implementation, on an architecture decision you are about to commit to, or when a plan needs holes found rather than agreement. Findings go back into the spec.
 ---
 
 # Grill spec

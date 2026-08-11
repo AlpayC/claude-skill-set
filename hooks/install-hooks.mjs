@@ -2,10 +2,12 @@
 // Installs the guardrail hooks into a target repo: copies the scripts to
 // <target>/.claude/hooks/ and merges the hook config into <target>/.claude/settings.json.
 //
-//   node hooks/install-hooks.mjs <target-repo> [--local] [--dry-run]
+//   node hooks/install-hooks.mjs <target-repo> [--local] [--permissions] [--dry-run]
 //
 // --local writes .claude/settings.local.json (personal, gitignored) instead of
 // .claude/settings.json (team-wide, committed).
+// --permissions also merges settings/permissions.json — the allowlist that lets an
+// unattended run proceed without bypassing permissions wholesale. See settings/README.md.
 import { readdirSync, readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -15,6 +17,7 @@ const args = process.argv.slice(2);
 const target = resolve(args.find((a) => !a.startsWith("--")) || process.cwd());
 const local = args.includes("--local");
 const dryRun = args.includes("--dry-run");
+const withPermissions = args.includes("--permissions");
 
 if (!existsSync(target)) {
   console.error(`Target does not exist: ${target}`);
@@ -82,7 +85,23 @@ for (const [event, entries] of Object.entries(CONFIG)) {
   }
 }
 
-if (!dryRun && added > 0) {
+// --- merge the permission allowlist -----------------------------------------
+let permsAdded = 0;
+if (withPermissions) {
+  const tpl = JSON.parse(readFileSync(join(here, "..", "settings", "permissions.json"), "utf8"));
+  settings.permissions ||= {};
+  for (const list of ["allow", "deny"]) {
+    settings.permissions[list] ||= [];
+    for (const rule of tpl.permissions[list]) {
+      if (settings.permissions[list].includes(rule)) continue;
+      settings.permissions[list].push(rule);
+      permsAdded++;
+    }
+  }
+  console.log(`  ${dryRun ? "would add" : "added"}   ${permsAdded} permission rule(s)`);
+}
+
+if (!dryRun && (added > 0 || permsAdded > 0)) {
   writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + "\n", "utf8");
 }
 

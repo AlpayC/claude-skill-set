@@ -1,0 +1,64 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(git branch*)",
+      "Bash(git rev-parse*)",
+      "Bash(git ls-files*)",
+      "Bash(git remote -v*)",
+      "Bash(git blame*)",
+
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git checkout -b*)",
+      "Bash(git switch*)",
+      "Bash(git stash*)",
+
+      "Bash(npm run*)",
+      "Bash(npm test*)",
+      "Bash(pnpm run*)",
+      "Bash(pnpm test*)",
+      "Bash(yarn run*)",
+
+      "Bash(npx tsc*)",
+      "Bash(npx vitest*)",
+      "Bash(npx jest*)",
+      "Bash(npx eslint*)",
+      "Bash(npx playwright test*)",
+      "Bash(npx prettier --check*)",
+
+      "Bash(nx run*)",
+      "Bash(nx affected*)",
+      "Bash(nx show*)",
+      "Bash(nx graph*)",
+      "Bash(nx list*)",
+
+      "Bash(gh run list*)",
+      "Bash(gh run view*)",
+      "Bash(gh pr view*)",
+      "Bash(gh pr list*)",
+      "Bash(gh issue view*)",
+
+      "Bash(ls*)",
+      "Bash(node --check*)"
+    ],
+    "deny": [
+      "Bash(git push*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)",
+      "Bash(git branch -D*)",
+      "Bash(git filter-branch*)",
+      "Bash(rm -rf*)",
+      "Bash(npm publish*)",
+      "Bash(pnpm publish*)",
+      "Bash(yarn publish*)"
+    ]
+  }
+}
