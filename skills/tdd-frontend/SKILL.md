@@ -17,6 +17,8 @@ That choice belongs to `spec-forge`, not to this loop. The spec names the seams 
 
 **Red.** Write the smallest test stating one behaviour from the acceptance criteria. Run it. It must fail *for the reason you predicted* — "expected the error panel, found nothing", not "cannot read property of undefined". A wrong-reason failure means the test is broken, so fix the test before writing any implementation.
 
+**A test asserting an absence is green from the start.** `expect(queryByRole(...)).not.toBeInTheDocument()` passes trivially while the element does not exist anywhere, so it never goes red and proves nothing about the behaviour it claims to cover — "the filter bar is hidden when the list is empty" passes identically when there is no filter bar at all. Give it a red phase by pairing it: the same test first asserts the element **is** present in the case where it should be, then absent in the case where it should not. Where that is impossible, write the absence test *after* the feature exists and confirm it fails by temporarily removing the condition.
+
 **Green.** Write the least code that passes it.
 
 **Refactor.** Improve the shape with the test green. Red during refactoring is a real behaviour change — undo it rather than adjusting the test.

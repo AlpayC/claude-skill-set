@@ -63,14 +63,16 @@ Domain glossary: docs/agent/glossary.md
 
 ## 4 — Verify by running
 
-An unverified context file is a guess. Pick a small real task in one app, run it against the new context, and watch for the two failure signatures:
+**Every gotcha that describes a procedure gets executed before it is written down.** "Reach the error state with `?fail=403`", "start the mock backend first", "clear the cache when X" — these read as facts and are frequently inferred from the code rather than tried. A wrong one is worse than a missing one: the next run follows it, sees the wrong result, and spends its budget deciding whether the app or the instruction is broken. Run it, watch what happens, and write down what you actually saw.
+
+Then the file as a whole. An unverified context file is a guess. Pick a small real task in one app, run it against the new context, and watch for the two failure signatures:
 
 - The agent **asked a question** the file should have answered → the answer was missing or too vague. Add it.
 - The agent **followed a rule that produced the wrong result** → the rule was overstated or stale. Correct it.
 
 ## Done when
 
-Root and per-app files exist, every line passes the "would get this wrong by default and cannot look it up" test, and one real task has been run end to end against them with its two failure signatures checked.
+Root and per-project files exist, every line passes the "would get this wrong by default and cannot look it up" test, every procedural gotcha has been executed and describes what was observed, and one real task has been run end to end against them with its two failure signatures checked.
 
 ## Maintenance
 

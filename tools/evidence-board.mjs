@@ -65,8 +65,12 @@ function parseGates(md) {
   for (const block of md.split(/^##\s+/m).slice(1)) {
     const name = block.split(/\r?\n/)[0].trim();
     const exit = block.match(/exit\s+(\d+)/i);
-    if (!exit) unparsed++;
-    entries.push({ name, exit: exit ? Number(exit[1]) : null, skipped: /\bskip(ped)?\b/i.test(block) });
+    const skipped = /\bskip(ped)?\b|übersprungen/i.test(block);
+    // A gate recorded as skipped has no exit code by definition — that is a stated
+    // absence, not an unreadable block, and reporting it as a gap trains people to
+    // ignore the gap list.
+    if (!exit && !skipped) unparsed++;
+    entries.push({ name, exit: exit ? Number(exit[1]) : null, skipped });
   }
   return { entries, unparsed };
 }
@@ -127,7 +131,10 @@ function collect() {
       console: read(join(evDir, "console.md")),
       repro: read(join(evDir, "repro.md")),
       hypotheses: read(join(evDir, "hypotheses.md")),
+      // Two sources on purpose: the spec states what was known to be unverifiable up
+      // front, visual-verify writes what it could not reach at run time.
       unverified: bullets(section(spec, "Unverified")),
+      unverifiedDoc: read(join(evDir, "unverified.md")),
       handoffs,
       gaps: [
         !spec && "keine Spec",
@@ -136,6 +143,7 @@ function collect() {
         red > 0 && `${red} rote${red === 1 ? "s" : ""} Gate`,
         !shots.length && "keine Screenshots",
         gates.entries.length && !read(join(evDir, "console.md")) && "Console/Network nicht erfasst",
+        shots.length && !read(join(evDir, "unverified.md")) && "kein Vermerk, welche Zustände nicht erreicht wurden",
         gates.unparsed && `${gates.unparsed} Gate-Block(s) ohne Exit-Code`,
       ].filter(Boolean),
     };
@@ -206,7 +214,7 @@ const card = (r) => `
             .join("")}</div></section>`
         : ""
     }
-    ${[["Console / Network", r.console], ["Repro", r.repro], ["Hypothesen", r.hypotheses]]
+    ${[["Console / Network", r.console], ["Nicht erreichte Zustände", r.unverifiedDoc], ["Repro", r.repro], ["Hypothesen", r.hypotheses]]
       .filter(([, v]) => v)
       .map(([h, v]) => `<section><h4>${h}</h4><pre>${esc(v.trim())}</pre></section>`)
       .join("")}

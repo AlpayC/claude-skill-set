@@ -20,6 +20,8 @@ Read `agentic-guardrails` before starting. It carries the ledger format, the rep
 
 Branch from the base branch named in the map. Work on a branch, always — an unattended run needs somewhere to roll back to.
 
+**Commit anything the preconditions produced before branching.** A freshly written repo map, a `CLAUDE.md`, an installed hook set — these belong to the repo, not to this ticket. Left uncommitted, they land in the feature branch and put the changed set permanently outside the blast radius, so the check at handover reports a mismatch that is real but says nothing about the feature. `git status` should be clean before the branch is created.
+
 Then declare the run at `.agent/current-run.json`, so the guardrail hooks can enforce the blast radius rather than trusting you to respect it:
 
 ```json

@@ -45,11 +45,11 @@ Per project, never one answer for the whole repo — even a single-package front
 | Language variant | `tsconfig` strictness, file extensions in the source root |
 | Test runner | `jest.config.*`, `vite.config.*`, `karma.conf.*`, `pytest.ini`, the test script |
 | E2E | sibling e2e project, `playwright.config.*`, `cypress.config.*` |
-| State / data layer | store or query dependencies — confirm against two real source files, not just the manifest |
+| State / data layer | **two real source files first**, then the manifest. A repo with no store dependency still has a convention — a per-feature hook, a service, a plain context — and reading the manifest first returns "none", which is the wrong answer written confidently |
 | Styling | SCSS, Tailwind config, CSS modules, styled-components in the source root |
 | HTTP layer | generated client, framework HTTP wrapper, `fetch` wrapper — name the file that owns it |
 
-State and HTTP are the slots downstream skills get wrong most often, because a dependency being installed does not mean this project uses it. Confirm both against real files.
+State and HTTP are the slots downstream skills get wrong most often, and they fail in both directions: a dependency being installed does not mean this project uses it, and no dependency does not mean there is no convention. Confirm both against real files, and where the answer is a convention rather than a library, write the convention down with the files that prove it.
 
 **Fan out across projects.** Detection is pure reading and each project is independent, so past roughly five projects, dispatch a subagent per project — or per batch of three or four in a large workspace — and have each return only the filled slot table plus the evidence path for each. A fifteen-app workspace goes from a long serial crawl to one round, and the subagent contexts absorb the file reading instead of yours.
 
