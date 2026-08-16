@@ -21,6 +21,18 @@ domain-glossary ─┘      ↑ ui-spec           ↑ tdd-frontend
 
 Nothing in the chain asks the human a question. Decisions go to the ledger in `agentic-guardrails`; only its four stop conditions end a run early.
 
+## Eleven fire on their own, the rest you type
+
+Only the skills a chain must reach without a human are model-invoked:
+
+`agentic-guardrails` · `repo-cartograph` · `api-contract-sync` · `spec-forge` · `grill-spec` · `pattern-mine` · `implement-spec` · `green-gate` · `visual-verify` · `self-review` · `pr-package`
+
+Everything else in the tables below is set to `user-invocable-only` in `settings.json` — it costs nothing in context, competes for no trigger, and `/its-name` still works. That is deliberate: a flaky test, a red pipeline, a design to build are situations **you** recognise, and recognising them is the judgement a person is there for.
+
+The consequence to know: a hand-invoked skill cannot be reached by another skill. Where a skill below says "hand it to `flaky-triage`", a run will report the finding instead of acting on it — and you take it from there.
+
+Promote a skill into the core once you have typed its name two or three times. `skill-forge` carries the rule.
+
 ## Foundation — build these first
 
 | Skill | Reach for it when |

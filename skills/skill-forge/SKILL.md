@@ -44,6 +44,16 @@ The description is the trigger, and it is loaded on every turn whether or not it
 
 Set `disable-model-invocation: true` only when the skill should fire by hand alone. It costs zero context — and costs you the memory of its existence, and stops any other skill from reaching it. Anything in a chain stays model-invoked.
 
+## A skill earns model-invocation by being used
+
+Writing a skill does not entitle it to a permanent line in every prompt. Thirty descriptions competing for one situation make the choice worse, not better, and the cost lands on the one thing that matters — whether the right one fires.
+
+So the default for a new skill is **hand-invoked**, and it is promoted when you have typed `/its-name` two or three times and know the situation is real. Demote the reverse way: a skill that has not fired in a quarter goes back to hand-invoked, and nothing is lost — `/its-name` still works.
+
+`skillOverrides` in `settings.json` does this without touching the file: `"user-invocable-only"` removes a skill from the model's reach while keeping the slash command. Use it to keep a small firing core beside a larger library, rather than deleting work that is merely not needed today.
+
+**The core is what a chain must reach without a human.** Everything a running skill invokes by name has to stay reachable, or the chain breaks silently at that step. Everything the *human* recognises the moment for — a flaky test, a red pipeline, a design to build — belongs in the library, because noticing it is exactly the judgement a person is there for.
+
 ## Revising
 
 Revision is mostly deletion. Working through an existing skill:
