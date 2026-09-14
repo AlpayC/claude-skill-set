@@ -1,0 +1,60 @@
+name: A skill did not fire, or fired wrongly
+description: The situation applied but the skill never triggered — or the wrong one did
+labels: [trigger]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the most valuable report in the repo. A skill that reads well and never
+        fires is invisible until someone hits exactly this.
+
+  - type: input
+    id: skill
+    attributes:
+      label: Which skill
+      placeholder: repo-cartograph
+    validations:
+      required: true
+
+  - type: textarea
+    id: prompt
+    attributes:
+      label: What you typed
+      description: The prompt verbatim — the wording is the evidence here.
+      render: text
+    validations:
+      required: true
+
+  - type: dropdown
+    id: what-happened
+    attributes:
+      label: What happened
+      options:
+        - It never fired
+        - A different skill fired instead
+        - It fired when it should not have
+        - It fired but stopped partway
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations:
+      required: true
+
+  - type: textarea
+    id: check
+    attributes:
+      label: Output of `node tools/check.mjs`
+      description: The summary line plus any warnings naming this skill.
+      render: text
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Environment
+      description: |
+        Claude Code version, how the set is installed (junction / copy, user / project
+        scope), and whether other skill plugins are installed — they compete for triggers.

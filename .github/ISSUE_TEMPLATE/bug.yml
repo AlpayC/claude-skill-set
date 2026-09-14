@@ -1,0 +1,51 @@
+name: Bug in a hook, tool or the installer
+description: Something in hooks/, tools/ or install.ps1 does not work
+labels: [bug]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where
+      options:
+        - install.ps1
+        - hooks/install-hooks.mjs
+        - a hook at runtime (block-dangerous, check-shortcuts, guard-paths, require-evidence)
+        - tools/check.mjs
+        - tools/evidence-board.mjs
+        - a skill's written steps
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Command and output
+      description: The exact command and what came back, including the exit code.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: OS, shell, `node --version`, Claude Code version.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: settings
+    attributes:
+      label: Relevant settings
+      description: |
+        The `hooks` and `permissions` blocks from the target repo's `settings.json`, with
+        anything private removed. A hook that fails closed usually fails on how it was merged.
+      render: json

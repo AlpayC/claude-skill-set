@@ -1,0 +1,55 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  skills:
+    name: skill set
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Errors mean a skill will not load and fail the job. Warnings mean it loads but
+      # probably will not fire — they are printed here and read, not enforced.
+      - name: Validate skills
+        run: node tools/check.mjs
+
+      # A hook that does not parse fails closed at the worst moment: mid-run, in someone
+      # else's repo. Parsing them here costs nothing.
+      - name: Parse hooks and tools
+        run: |
+          for f in hooks/*.mjs tools/*.mjs; do
+            node --check "$f" || exit 1
+          done
+
+  installer:
+    name: installer parses
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # install.ps1 is the entry point for everyone using this set. A syntax error in it
+      # is only discovered at install time unless something reads it here.
+      - name: Parse install.ps1
+        shell: pwsh
+        run: |
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path ./install.ps1), [ref]$null, [ref]$errors) | Out-Null
+          if ($errors) { $errors | ForEach-Object { Write-Error $_.Message }; exit 1 }
+          Write-Host 'install.ps1 parses'

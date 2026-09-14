@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Which skill do I reach for?
+    url: https://github.com/AlpayC/claude-skill-set/blob/main/skills/skills-map/SKILL.md
+    about: The index — every skill with the situation it applies to, and the order they chain in.
+  - name: The rules behind the set
+    url: https://github.com/AlpayC/claude-skill-set/blob/main/skills/agentic-guardrails/SKILL.md
+    about: Assumption ledger, repair budget, stop conditions, evidence. Read this before reporting that an agent decided something on its own — it is supposed to.
+  - name: Claude Code documentation
+    url: https://docs.claude.com/en/docs/claude-code
+    about: Questions about Claude Code itself — skills, hooks, settings — rather than this set.

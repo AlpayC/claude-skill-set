@@ -1,0 +1,11 @@
+version: 2
+updates:
+  # The repo has no runtime dependencies — Node builtins only. The actions in
+  # .github/workflows are the one third-party surface, so that is what is watched.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "ci"
+    labels: [ci]
