@@ -1,40 +1,42 @@
-# Claude Skill Set — Agentic Coding mit Leitplanken
+# Claude Skill Set — Agentic Coding with Guardrails
 
-Ein Satz von 34 Skills für Claude Code, gebaut für **agentisches Arbeiten in Enterprise-Codebases**: der Agent soll ein Ticket end-to-end umsetzen können, ohne während der Implementierung nachzufragen.
+[![check](https://github.com/AlpayC/claude-skill-set/actions/workflows/check.yml/badge.svg)](https://github.com/AlpayC/claude-skill-set/actions/workflows/check.yml)
 
-## Das Leitprinzip
+A set of 35 skills for Claude Code, built for **agentic work in enterprise codebases**: the agent should be able to take a ticket end to end without asking a question mid-implementation.
 
-Autonomie entsteht nicht durch bessere Implementierungs-Prompts, sondern dadurch, dass die menschliche Entscheidung aus der Mitte an die Ränder wandert:
+## The guiding principle
+
+Autonomy does not come from better implementation prompts. It comes from moving the human decision out of the middle and onto the edges:
 
 ```
-VORHER (Mensch entscheidet)  →  WÄHREND (Agent allein)  →  NACHHER (Mensch reviewt)
-Spec, Akzeptanzkriterien,       Ledger statt Rückfrage,     Evidence-Paket,
-Kontext, Blast Radius           Gate statt Behauptung       Self-Review, PR
+BEFORE (human decides)      →  DURING (agent alone)        →  AFTER (human reviews)
+Spec, acceptance criteria,     Ledger instead of question,    Evidence package,
+context, blast radius          gate instead of claim          self-review, PR
 ```
 
-Jede Rückfrage während der Umsetzung hat genau zwei Ursachen: **fehlender Kontext** (der Agent weiß nicht, wie ihr Dinge tut) oder **unentschiedene Spec** (die Frage war vorher schon offen). Die Skills zahlen auf jeweils eine davon ein.
+Every question asked during implementation has exactly two causes: **missing context** (the agent does not know how you do things) or **an undecided spec** (the question was already open beforehand). Each skill pays into one of those two.
 
-Drei Primitive tragen das:
+Three primitives carry it:
 
-- **Assumption Ledger** — statt zu fragen entscheidet der Agent, schreibt Entscheidung, Alternative, Begründung und Reversal Cost nach `docs/specs/<id>.assumptions.md` und arbeitet weiter. Der Mensch prüft die Liste im Review.
-- **Repair Budget** — drei Reparaturversuche pro rotem Gate, jeder mit vorher ausgesprochener Hypothese. Danach Revert und präziser Fehlerbericht statt Weiterwursteln.
-- **Evidence** — „funktioniert" ist eine Behauptung; jede Behauptung braucht ihren Beleg (Exit Code, Screenshot). Ohne Beleg wird sie als *unverified* gemeldet.
+- **Assumption ledger** — instead of asking, the agent decides, writes decision, alternative, reasoning and reversal cost to `docs/specs/<id>.assumptions.md`, and keeps working. The human checks the list at review time.
+- **Repair budget** — three repair attempts per red gate, each with a hypothesis stated up front. After that: revert and a precise failure report, rather than more flailing.
+- **Evidence** — "it works" is a claim; every claim needs its proof (exit code, screenshot). Without proof it is reported as *unverified*.
 
-Alle drei stehen an genau einer Stelle: `agentic-guardrails`. Alle anderen Skills referenzieren sie per Name.
+All three live in exactly one place: `agentic-guardrails`. Every other skill references them by name.
 
-**Und sie stehen nicht nur als Text da.** Vier dieser Regeln sind als Hooks installierbar (`guardrail-hooks`) und werden damit erzwungen statt erbeten — Prosa im Kontextfenster ist ein Vorschlag, und die Befolgung sinkt mit der Sessionlänge, also genau unter der Bedingung, die unbeaufsichtigtes Arbeiten herstellt.
+**And they are not only text.** Four of these rules are installable as hooks (`guardrail-hooks`) and are therefore enforced rather than requested — prose in the context window is a suggestion, and adherence drops as the session gets longer, which is precisely the condition unattended work creates.
 
-## Eigenständig
+## Self-contained
 
-Der Satz hat keine Abhängigkeit zu anderen Skill-Plugins. Jeder Skill referenziert nur Skills aus diesem Repo, und die geteilten Regeln stehen ausschließlich in `agentic-guardrails`. Was hier gebraucht wird, ist hier drin — kein Plugin, das sich unter dir ändern kann.
+The set has no dependency on other skill plugins. Every skill references only skills from this repo, and the shared rules live exclusively in `agentic-guardrails`. What is needed here is in here — no plugin that can change underneath you.
 
-## Repo-agnostisch
+## Repo-agnostic
 
-Die Skills nehmen keine bestimmte Repo-Struktur an. `repo-cartograph` erkennt die Workspace-Art — NX, Turborepo, pnpm/npm/yarn-Workspaces, Lerna, Rush, Single-Package, Polyrepo, Maven/Gradle/.NET/Go/Cargo — und schreibt Enumerierung, Dependency-Graph, Gate-Kommandos, Boundary-Mechanismus und Changed-Set-Befehl nach `docs/agent/repo-map.md`. Alle anderen Skills lesen daraus, statt Kommandos zu raten. Für Repos ohne Affected-Tooling gibt es eine Fallback-Leiter (`git diff` → Manifest-Zuordnung → Dependents → bei Root-Config alles).
+The skills assume no particular repo structure. `repo-cartograph` detects the workspace kind — NX, Turborepo, pnpm/npm/yarn workspaces, Lerna, Rush, single package, polyrepo, Maven/Gradle/.NET/Go/Cargo — and writes enumeration, dependency graph, gate commands, boundary mechanism and changed-set command to `docs/agent/repo-map.md`. Every other skill reads from that instead of guessing commands. For repos without affected-tooling there is a fallback ladder (`git diff` → manifest mapping → dependents → everything, when a root config changed).
 
-Bei mehreren Repos (Frontend + Backend) bekommt jedes seine eigene Map; die Verbindung steht unter **Seams** und wird von `api-contract-sync` und `feature-trace` benutzt.
+With several repos (frontend + backend) each gets its own map; the connection between them sits under **Seams** and is used by `api-contract-sync` and `feature-trace`.
 
-## Die Kette
+## The chain
 
 ```
 repo-cartograph ─┐
@@ -43,109 +45,126 @@ api-contract-sync┤      ↑ grill-spec        ↑ pattern-mine
 domain-glossary ─┘      ↑ ui-spec           ↑ tdd-frontend
 ```
 
-## Die Skills
+Nothing in the chain asks the human a question. Decisions go to the ledger; only the four stop conditions in `agentic-guardrails` end a run early.
 
-**Fundament** — `repo-cartograph` · `context-baseline` · `api-contract-sync` · `domain-glossary`
-**Vor der Umsetzung** — `epic-map` · `spec-forge` · `grill-spec` · `ui-spec`
-**Während** — `implement-spec` · `agentic-guardrails` · `guardrail-hooks` · `green-gate` · `visual-verify` · `pattern-mine` · `tdd-frontend` · `bug-hunt` · `refactor-safe` · `dep-upgrade`
-**Danach** — `self-review` · `pr-package` · `review-run` · `adr-capture` · `session-handoff`
-**Wissen** — `explain-like-im-new` · `feature-trace` · `arc42-sync` · `dev-wiki` · `runbook`
+## The skills
+
+**Foundation** — `repo-cartograph` · `context-baseline` · `api-contract-sync` · `domain-glossary`
+**Before implementing** — `epic-map` · `spec-forge` · `grill-spec` · `ui-spec`
+**While implementing** — `implement-spec` · `agentic-guardrails` · `guardrail-hooks` · `green-gate` · `visual-verify` · `pattern-mine` · `tdd-frontend` · `bug-hunt` · `refactor-safe` · `dep-upgrade`
+**After** — `self-review` · `pr-package` · `review-run` · `adr-capture` · `session-handoff`
+**Knowledge** — `explain-like-im-new` · `feature-trace` · `arc42-sync` · `dev-wiki` · `runbook`
 **CI/CD** — `pipeline-doctor` · `flaky-triage` · `ci-authoring` · `perf-budget`
 **Meta** — `autonomy-postmortem` · `skill-forge` · `skills-map`
 
-Details und Auswahlhilfe: `/skills-map`.
+Details and a "which one do I reach for" table: `/skills-map`.
 
 ## Installation
 
 ```powershell
-.\install.ps1            # Junctions nach ~\.claude\skills (Änderungen wirken sofort)
-.\install.ps1 -Copy      # stattdessen kopieren
-.\install.ps1 -Scope project -Target C:\pfad\zum\repo   # nur für ein Repo
+.\install.ps1            # junctions into ~\.claude\skills (edits take effect immediately)
+.\install.ps1 -Copy      # copy instead
+.\install.ps1 -Scope project -Target C:\path\to\repo   # for one repo only
 ```
 
-Skills werden beim nächsten Start von Claude Code geladen.
+Skills are loaded the next time Claude Code starts.
 
-Skills und die drei Reviewer-Agenten kommen mit `install.ps1`. Hooks und Permissions werden **pro Ziel-Repo** installiert, weil sie dessen Blast Radius und Evidence prüfen:
+Skills and the three reviewer agents come with `install.ps1`. Hooks and permissions are installed **per target repo**, because they check that repo's blast radius and evidence:
 
 ```bash
-node hooks/install-hooks.mjs C:\pfad\zum\repo --permissions   # Hooks + Allowlist
-node hooks/install-hooks.mjs C:\pfad\zum\repo --local         # persönlich, settings.local.json
-node hooks/install-hooks.mjs C:\pfad\zum\repo --dry-run       # nur zeigen
+node hooks/install-hooks.mjs C:\path\to\repo --permissions   # hooks + allowlist
+node hooks/install-hooks.mjs C:\path\to\repo --local         # personal, settings.local.json
+node hooks/install-hooks.mjs C:\path\to\repo --dry-run       # show only
 ```
 
-`--permissions` merged die Allowlist aus `settings/permissions.json` dazu — sie lässt einen unbeaufsichtigten Lauf durchlaufen, ohne Permissions komplett zu umgehen. Begründung und was bewusst **nicht** drin ist: `settings/README.md`.
+`--permissions` merges in the allowlist from `settings/permissions.json` — it lets an unattended run get through without bypassing permissions entirely. The reasoning, and what is deliberately **not** in it: `settings/README.md`.
 
-Merged in bestehende Settings, idempotent, ergänzt `.agent/` in der `.gitignore`. Danach einmal `/hooks` öffnen oder neu starten — der Settings-Watcher folgt nur Verzeichnissen, die beim Sessionstart schon eine Settings-Datei hatten.
+Merges into existing settings, idempotent, adds `.agent/` to the `.gitignore`. Afterwards open `/hooks` once or restart — the settings watcher only follows directories that already had a settings file at session start.
 
-## Reihenfolge für den Start
+## Where to start
 
-1. **`repo-cartograph`** im Frontend-Repo, dann im Backend-Repo. Alles andere liest die Map.
-2. **`context-baseline`** — Root-`CLAUDE.md` plus je eine Datei pro App, die abweicht.
-3. **`api-contract-sync`** — einmal einrichten, damit die API-Form nie geraten wird.
-4. Dann ein echtes, kleines Ticket durch **`spec-forge` → `implement-spec`** laufen lassen.
-5. Nach jeder Unterbrechung **`autonomy-postmortem`**.
+1. **`repo-cartograph`** in the frontend repo, then in the backend repo. Everything else reads the map.
+2. **`context-baseline`** — a root `CLAUDE.md` plus one file per app that deviates from it.
+3. **`api-contract-sync`** — set up once, so the API shape is never guessed.
+4. Then run a real, small ticket through **`spec-forge` → `implement-spec`**.
+5. After every interruption, **`autonomy-postmortem`**.
 
-Schritt 5 ist der wichtigste. Ohne ihn bleibt der Satz so autonom wie am Installationstag; mit ihm entfernt jede Unterbrechung dauerhaft eine ganze Klasse von Unterbrechungen.
+Step 5 is the important one. Without it the set stays as autonomous as it was on installation day; with it, every interruption permanently removes a whole class of interruptions.
 
-## Artefakte, die die Skills anlegen
+## Artefacts the skills create
 
-| Pfad | Von | Inhalt |
+| Path | From | Contents |
 |---|---|---|
-| `docs/agent/repo-map.md` | `repo-cartograph` | Workspace-Art, Projekte, Stacks, Gates, Boundaries, Seams |
-| `docs/agent/glossary.md` | `domain-glossary` | Fachbegriff → Code-Identifier, mit Aliassen |
-| `docs/agent/wiki/` | `dev-wiki` | Beantwortete Fragen mit Datei-Belegen |
-| `docs/agent/autonomy-log.md` | `autonomy-postmortem` | Eine Zeile pro Unterbrechung — der Trend |
-| `docs/agent/perf-baseline.md` | `perf-budget` | Gemessene Baseline mit Commit und Bedingungen |
-| `docs/epics/<id>.md` | `epic-map` | Slices, offene Entscheidungen, Gelerntes |
-| `docs/specs/<id>.md` | `spec-forge` | Die Spec, gegen die der Lauf läuft |
-| `docs/specs/<id>.assumptions.md` | alle Umsetzungs-Skills | Das Ledger |
-| `.agent/current-run.json` | `implement-spec` | Aktiver Lauf — die Hooks lesen daraus Blast Radius und Status |
-| `.agent/handoff/` | `session-handoff` | Übergabenotizen, chronologisch |
-| `docs/adr/NNNN-*.md` | `adr-capture` | Architekturentscheidungen (arc42 Kap. 9 indiziert sie) |
-| `docs/architecture/` | `arc42-sync` | arc42-Dokument, ein File pro Kapitel |
-| `.agent/evidence/<id>/` | `green-gate`, `visual-verify`, `bug-hunt` | Gate-Output, Screenshots, Console/Network, Repro-Kommando, gerankte Hypothesen |
+| `docs/agent/repo-map.md` | `repo-cartograph` | Workspace kind, projects, stacks, gates, boundaries, seams |
+| `docs/agent/glossary.md` | `domain-glossary` | Domain term → code identifier, with aliases |
+| `docs/agent/wiki/` | `dev-wiki` | Answered questions with file-level proof |
+| `docs/agent/autonomy-log.md` | `autonomy-postmortem` | One line per interruption — the trend |
+| `docs/agent/perf-baseline.md` | `perf-budget` | Measured baseline with commit and conditions |
+| `docs/epics/<id>.md` | `epic-map` | Slices, open decisions, what was learned |
+| `docs/specs/<id>.md` | `spec-forge` | The spec the run executes against |
+| `docs/specs/<id>.assumptions.md` | every implementation skill | The ledger |
+| `.agent/current-run.json` | `implement-spec` | The active run — hooks read blast radius and status from it |
+| `.agent/handoff/` | `session-handoff` | Handover notes, chronological |
+| `docs/adr/NNNN-*.md` | `adr-capture` | Architecture decisions (arc42 ch. 9 indexes them) |
+| `docs/architecture/` | `arc42-sync` | arc42 document, one file per chapter |
+| `.agent/evidence/<id>/` | `green-gate`, `visual-verify`, `bug-hunt` | Gate output, screenshots, console/network, repro command, ranked hypotheses |
 
-`.agent/` gehört in die `.gitignore`; `docs/` wird committet.
+`.agent/` belongs in `.gitignore`; `docs/` is committed.
 
-## Die Morgen-Review
+## The morning review
 
-Zwei getrennte Oberflächen, mit Absicht:
+Two separate surfaces, on purpose:
 
-- **Überblick** — `node tools/evidence-board.mjs <repo>` erzeugt `.agent/board.html`: alle Läufe in vier Spalten (Spec bereit, Läuft, Review nötig, Blockiert), Lücken gelb markiert, Screenshots eingebettet. Eine Datei ohne Server, gitignored, weil sie interne Screenshots enthält.
-- **Eingriff** — `review-run` legt dir einen Lauf **im Gespräch** vor: Entscheidungen zuerst mit Empfehlung, Screenshots inline gerendert, Lücken als Fragen formuliert. Du antwortest an derselben Stelle, der Agent setzt sofort um.
+- **Overview** — `node tools/evidence-board.mjs <repo>` produces `.agent/board.html`: every run in four columns (spec ready, running, needs review, blocked), gaps marked yellow, screenshots embedded. One file, no server, gitignored because it contains internal screenshots.
+- **Intervention** — `review-run` walks you through a run **in the conversation**: decisions first with a recommendation, screenshots rendered inline, gaps phrased as questions. You answer in the same place and the agent acts on it immediately.
 
-Das Board sagt dir, worauf du schauen musst. Der Eingriff passiert im Chat, damit ein Einwand einen Satz kostet statt Kopieren und Fensterwechsel.
+The board tells you where to look. The intervention happens in chat, so an objection costs a sentence instead of copying and switching windows.
 
-## Parallelität
+## Parallelism
 
-Eine Regel: **Lesen parallelisieren, Schreiben serialisieren.** Zwei Agents in einem Arbeitsbaum zerschießen sich gegenseitig.
+One rule: **parallelise reading, serialise writing.** Two agents in one working tree destroy each other's work.
 
-Fan-out per Subagent nutzen `repo-cartograph` (Stack-Erkennung pro Projekt), `pattern-mine` (die drei Beispiele), `feature-trace` (Frontend- und Backend-Pfad), `epic-map` (eine Recherche pro offener Entscheidung), `green-gate` (finaler Lauf über unabhängige Projekte) und `self-review` (drei Achsen in frischem Kontext).
+Fan-out via subagents is used by `repo-cartograph` (stack detection per project), `pattern-mine` (the three examples), `feature-trace` (frontend and backend path), `epic-map` (one lookup per open decision), `green-gate` (the final run across independent projects) and `self-review` (three axes in fresh context).
 
-Bewusst seriell: der `green-gate`-Schrittloop (billigstes zuerst ist der Punkt) und `bug-hunt` Phase 4 (mehrere Hypothesen gleichzeitig heißt mehrere Variablen gleichzeitig).
+Deliberately serial: the `green-gate` step loop (cheapest first is the whole point) and `bug-hunt` phase 4 (several hypotheses at once means several variables at once).
 
-Für zwei Tickets parallel: zwei **git worktrees**, je eigener Branch, eigene `.agent/current-run.json`, eigener Blast Radius. Details in `/skills-map`.
+For two tickets in parallel: two **git worktrees**, each with its own branch, its own `.agent/current-run.json`, its own blast radius. Details in `/skills-map`.
 
-## Context Load
+## Context load
 
-Die 32 model-invoked Beschreibungen liegen bei ~8,4 KB (≈ 2.100 Token) und sind in jedem Turn geladen. `skillListingBudgetFraction` (Default 1 % des Fensters) kürzt automatisch, wenn die gesamte Skill-Liste — inklusive aller anderen installierten Plugins — darüber liegt.
+Eleven skills fire on their own. They are the ones a chain must reach without a human:
 
-Bis auf `skills-map` und `skill-forge` sind alle Skills model-invoked — sie feuern selbst und können sich gegenseitig aufrufen, was die Kette überhaupt erst ohne Tippen laufen lässt. Preis dafür ist, dass ihre `description` in jedem Turn im Kontext liegt.
+`agentic-guardrails` · `repo-cartograph` · `api-contract-sync` · `spec-forge` · `grill-spec` · `pattern-mine` · `implement-spec` · `green-gate` · `visual-verify` · `self-review` · `pr-package`
 
-Wer das reduzieren will: `disable-model-invocation: true` ins Frontmatter der Skills, die nur per Hand starten sollen. Was in einer Kette steckt, bleibt model-invoked — ein user-invoked Skill kann von keinem anderen Skill erreicht werden.
+The other twenty-four are set to `user-invocable-only` through `skillOverrides` in `settings.json`. Nothing is deleted: `/its-name` still works and the content is unchanged, but the skill costs no context and competes for no trigger. That is deliberate — a flaky test, a red pipeline, a design to build are situations **you** recognise, and recognising them is the judgement a person is there for.
 
-## Was noch im Repo liegt
+The cost of that split, stated plainly: a hand-invoked skill cannot be reached by another skill. Where a skill says "hand it to `flaky-triage`", the run reports the finding instead of acting on it.
 
-| Pfad | Wofür |
+The numbers, from `node tools/check.mjs`:
+
+| | Descriptions in context | Per turn |
+|---|---|---|
+| The firing eleven | 3,166 chars | ≈ 790 tokens |
+| All thirty-five | 9,271 chars | ≈ 2,320 tokens |
+
+`skillListingBudgetFraction` (default 1 % of the window) truncates automatically when the whole skill listing — including every other installed plugin — goes above it.
+
+Promote a skill into the firing core once you have typed its name two or three times. `skill-forge` carries the rule so the core does not grow back by accident.
+
+## What else is in the repo
+
+| Path | For |
 |---|---|
-| `hooks/` | Vier Node-Hooks, die vier Guardrail-Regeln erzwingen statt erbitten |
-| `agents/` | Die drei Reviewer, die `self-review` in frischem Kontext losschickt — ohne Editier-Werkzeuge |
-| `settings/` | Permissions-Allowlist plus die Begründung, was drin ist und was nicht |
-| `tools/evidence-board.mjs` | Das Review-Board über alle Läufe |
-| `tools/check.mjs` | Prüft den Skill-Satz selbst — vor dem Commit und in CI |
+| `hooks/` | Four Node hooks that enforce four guardrail rules instead of requesting them |
+| `agents/` | The three reviewers `self-review` dispatches in fresh context — without editing tools |
+| `settings/` | Permissions allowlist plus the reasoning for what is in it and what is not |
+| `tools/evidence-board.mjs` | The review board across all runs |
+| `tools/check.mjs` | Checks the skill set itself — before a commit and in CI |
 
-`node tools/check.mjs` meldet Fehler (Skill lädt nicht) und Warnungen (Skill lädt, feuert aber vermutlich nicht). Die Warnung „leads with the artefact" fängt genau den Fehler, der `repo-cartograph` im echten Repo nicht feuern ließ.
+`node tools/check.mjs` reports errors (the skill will not load) and warnings (it loads but probably will not fire). The warning "leads with the artefact" catches exactly the mistake that kept `repo-cartograph` from firing in a real repo.
 
-## Anpassen
+## Customising
 
-Die Skills sind bewusst Prozess und nicht Konfiguration — sie sollen gelesen und verändert werden. `skill-forge` beschreibt den Hausstil: benannter Failure Mode am Anfang, prüfbare `## Done when`-Kriterien, positive Formulierung statt Verbote, eine Wahrheitsquelle pro Regel, Kommandos aus der Umgebung statt hartkodiert.
+The skills are process, not configuration — they are meant to be read and changed. `skill-forge` describes the house style: named failure mode up front, checkable `## Done when` criteria, positive phrasing instead of prohibitions, one source of truth per rule, commands taken from the environment instead of hardcoded.
+
+The workflow for changes is in [CONTRIBUTING.md](.github/CONTRIBUTING.md): run `node tools/check.mjs` before committing, and CI runs it again on every push and pull request.
