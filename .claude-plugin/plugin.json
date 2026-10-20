@@ -1,0 +1,21 @@
+{
+  "name": "skill-set",
+  "version": "1.0.0",
+  "description": "35 skills and three reviewer agents for Claude Code in enterprise codebases, so an agent can take a ticket end to end without a question mid-implementation: spec first, gates in between, evidence at the end. Hooks and permissions stay a per-repo install (hooks/install-hooks.mjs).",
+  "author": {
+    "name": "AlpayC",
+    "url": "https://github.com/AlpayC"
+  },
+  "homepage": "https://alpaycelik.dev/en/projects/claude-skill-set",
+  "repository": "https://github.com/AlpayC/claude-skill-set",
+  "keywords": [
+    "claude-code",
+    "skills",
+    "agents",
+    "agentic",
+    "spec",
+    "code-review",
+    "guardrails",
+    "enterprise"
+  ]
+}

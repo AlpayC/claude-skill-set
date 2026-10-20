@@ -61,6 +61,16 @@ Nothing in the chain asks the human a question. Decisions go to the ledger, and 
 
 ## Installation
 
+As a Claude Code plugin, served from this repository (Claude Code 2.1.275 or later):
+
+```
+/plugin install skill-set --marketplace AlpayC/claude-skill-set
+```
+
+`/plugin marketplace update claude-skill-set` picks up later changes. Installed this way the skills and agents carry the plugin's prefix (`skill-set:spec-forge`). The hooks are not part of the plugin; they stay a per-repo install, below.
+
+Or as plain files, with the installer:
+
 ```powershell
 .\install.ps1            # junctions into ~\.claude\skills (edits take effect immediately)
 .\install.ps1 -Copy      # copy instead
