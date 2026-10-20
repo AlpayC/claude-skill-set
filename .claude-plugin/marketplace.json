@@ -1,0 +1,15 @@
+{
+  "name": "claude-skill-set",
+  "description": "The Claude Skill Set, distributed from the repository that maintains it.",
+  "owner": {
+    "name": "AlpayC",
+    "url": "https://github.com/AlpayC"
+  },
+  "plugins": [
+    {
+      "name": "skill-set",
+      "source": "./",
+      "description": "35 skills and three reviewer agents for agentic work in enterprise codebases."
+    }
+  ]
+}
